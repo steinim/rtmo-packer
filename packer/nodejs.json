@@ -1,8 +1,8 @@
 {
     "variables": {
-        "aws_access_key": "{{env `aws_access_key`}}",
-        "aws_secret_key": "{{env `aws_secret_key`}}",
-        "atlas_username": "ATLAS_ACCOUNT_NAME"
+        "aws_access_key": "{{env `TF_VAR_access_key`}}",
+        "aws_secret_key": "{{env `TF_VAR_secret_key`}}",
+        "atlas_username": "{{env `TF_VAR_atlas_username`}}"
     },
     "builders": [{
         "type": "amazon-ebs",
