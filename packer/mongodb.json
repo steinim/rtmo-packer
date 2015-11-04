@@ -15,8 +15,8 @@
         "ami_name": "mongodb {{timestamp}}"
     }],
     "push": {
-      "name": "{{user `atlas_username`}}/mongodb",
-      "vcs": false
+        "name": "{{user `atlas_username`}}/mongodb",
+        "vcs": false
     },
     "provisioners": [
     {
@@ -24,9 +24,9 @@
         "script": "scripts/mongodb.sh"
     },
     {
-	"type": "puppet-masterless",
-	"manifest_file": "puppet/manifests/mongodb.pp",
-	"module_paths": ["puppet/modules/"]
+        "type": "puppet-masterless",
+        "manifest_file": "puppet/manifests/mongodb.pp",
+        "module_paths": ["puppet/modules/"]
     }
     ],
     "post-processors": [
