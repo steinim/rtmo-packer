@@ -15,8 +15,8 @@
         "ami_name": "nodejs {{timestamp}}"
     }],
     "push": {
-      "name": "{{user `atlas_username`}}/nodejs",
-      "vcs": false
+        "name": "{{user `atlas_username`}}/nodejs",
+        "vcs": false
     },
     "provisioners": [
     {
