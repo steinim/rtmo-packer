@@ -20,6 +20,25 @@ resource "atlas_artifact" "nodejs" {
   lifecycle { create_before_destroy = true }
 }
 
+resource "atlas_artifact" "consul" {
+  name = "${var.atlas_username}/consul"
+  type = "aws.ami"
+
+  lifecycle { create_before_destroy = true }
+}
+
+// TEMPLATES
+resource "template_file" "consul_upstart" {
+  filename = "files/consul.sh"
+
+  vars {
+    atlas_user_token = "${var.atlas_user_token}"
+    atlas_username = "${var.atlas_username}"
+    atlas_environment = "${var.atlas_environment}"
+    consul_server_count = "${var.consul_server_count}"
+    }
+}
+
 // SSH Keys
 module "ssh_keys" {
   source = "./ssh_keys"
@@ -112,6 +131,7 @@ resource "aws_instance" "mongodb" {
 
   vpc_security_group_ids = ["${aws_security_group.mongodb.id}"]
 
+  user_data = "${template_file.consul_upstart.rendered}"
   tags { Name = "${var.name}-mongodb" }
   lifecycle { create_before_destroy = true }
 }
@@ -138,7 +158,7 @@ resource "aws_security_group" "nodejs" {
     to_port     = 22
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   ingress {
     protocol    = "tcp"
     from_port   = 5000
@@ -163,20 +183,36 @@ resource "aws_instance" "nodejs" {
 
   vpc_security_group_ids = ["${aws_security_group.nodejs.id}"]
 
+  user_data = "${template_file.consul_upstart.rendered}"
   tags { Name = "${var.name}-nodejs" }
   lifecycle { create_before_destroy = true }
   depends_on = ["aws_instance.mongodb"]
 
-  provisioner "remote-exec" {
-    connection {
-      user     = "ubuntu"
-      key_file = "${module.ssh_keys.private_key_path}"
-    }
+  # provisioner "remote-exec" {
+  #   connection {
+  #     user     = "ubuntu"
+  #     key_file = "${module.ssh_keys.private_key_path}"
+  #   }
 
-    inline = [
-      "sudo puppet apply -e \"class { 'letschat::app': dbuser => 'lcadmin', dbpass => 'somepass', dbname => 'letschat', dbhost => '${aws_instance.mongodb.private_dns}', }\""
-    ]
-  }
+  #   inline = [
+  #     "sudo puppet apply -e \"class { 'letschat::app': dbuser => 'lcadmin', dbpass => 'somepass', dbname => 'letschat', dbhost => '${aws_instance.mongodb.private_dns}', }\""
+  #   ]
+  # }
+}
+
+//Consul Instance
+resource "aws_instance" "consul" {
+  ami             = "${atlas_artifact.consul.metadata_full.region-us-east-1}"
+  instance_type   = "t2.small"
+  key_name        = "${module.ssh_keys.key_name}"
+  subnet_id       = "${aws_subnet.public.id}"
+
+  vpc_security_group_ids = ["${aws_security_group.nodejs.id}"]
+
+  user_data = "${template_file.consul_upstart.rendered}"
+  tags { Name = "${var.name}-consul" }
+  lifecycle { create_before_destroy = true }
+  count = "${var.consul_server_count}"
 }
 
 output "letschat_address" {
