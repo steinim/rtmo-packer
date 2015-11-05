@@ -12,7 +12,7 @@
     }],
     "push": {
         "name": "{{user `atlas_username`}}/mongodb",
-        "vcs": false
+        "vcs": true
     },
     "provisioners": [
     {
