@@ -25,14 +25,12 @@
         "module_paths": ["puppet/modules/"]
     }
     ],
-    "post-processors": [
-      {
+    "post-processors": [{
         "type": "atlas",
         "artifact": "{{user `atlas_username`}}/mongodb",
         "artifact_type": "aws.ami",
         "metadata": {
-          "created_at": "{{timestamp}}"
+            "created_at": "{{timestamp}}"
         }
-      }
-    ]
+    }]
 }
