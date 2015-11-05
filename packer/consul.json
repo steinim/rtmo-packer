@@ -11,7 +11,7 @@
         "ami_name": "consul {{timestamp}}"
     }],
     "push": {
-        "name": "{{user `atlas_username`}}/consul-gce",
+        "name": "{{user `atlas_username`}}/consul",
         "vcs": true
     },
     "provisioners": [
