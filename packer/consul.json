@@ -1,0 +1,41 @@
+{
+    "variables": {
+        "atlas_username": "ATLAS_ACCOUNT_NAME"
+    },
+    "builders": [{
+        "type": "amazon-ebs",
+        "region": "us-east-1",
+        "source_ami": "ami-cf5beba4",
+        "instance_type": "t2.micro",
+        "ssh_username": "ubuntu",
+        "ami_name": "consul {{timestamp}}"
+    }],
+    "push": {
+        "name": "{{user `atlas_username`}}/consul-gce",
+        "vcs": true
+    },
+    "provisioners": [
+    {
+        "type": "shell",
+        "script": "scripts/consul.sh"
+    },
+    {
+        "type": "file",
+        "source": "files/consul.json",
+        "destination": "/etc/consul.d/consul.json"
+    },
+    {
+        "type": "file",
+        "source": "files/consul_server.conf",
+        "destination": "/etc/init/consul.conf"
+    }
+    ],
+    "post-processors": [{
+        "type": "atlas",
+        "artifact": "{{user `atlas_username`}}/consul",
+        "artifact_type": "aws.ami",
+        "metadata": {
+            "created_at": "{{timestamp}}"
+        }
+    }]
+}
