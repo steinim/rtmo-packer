@@ -1,6 +1,6 @@
 {
     "variables": {
-        "atlas_username": "larstobi"
+        "atlas_username": "USERNAME"
     },
     "builders": [{
         "type": "amazon-ebs",
