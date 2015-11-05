@@ -203,7 +203,7 @@ resource "aws_instance" "nodejs" {
 //Consul Instance
 resource "aws_instance" "consul" {
   ami             = "${atlas_artifact.consul.metadata_full.region-us-east-1}"
-  instance_type   = "t2.small"
+  instance_type   = "t2.micro"
   key_name        = "${module.ssh_keys.key_name}"
   subnet_id       = "${aws_subnet.public.id}"
 
